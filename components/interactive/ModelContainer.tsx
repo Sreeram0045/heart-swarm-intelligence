@@ -39,30 +39,18 @@ export default function ModelContainer() {
   };
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      <div className="flex flex-col items-center space-y-8">
-        <h2 className="text-xl font-medium self-start px-2">Data Input</h2>
+    <div className="w-full flex flex-col items-center space-y-16">
+      <div className="w-full max-w-3xl">
         {/* Pass the loading state to the form */}
         <InteractionForm onSubmit={handleProcessData} isProcessing={isProcessing} />
       </div>
 
-      <div className="flex flex-col space-y-8 h-full">
-        <h2 className="text-xl font-medium px-2">Analysis & Insights</h2>
-
-        <div className="flex-1 space-y-6">
-          {isProcessing ? (
-            <div className="flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 text-zinc-400 dark:border-zinc-800 animate-pulse">
-              <p className="text-sm">Querying Swarm Intelligence...</p>
-            </div>
-          ) : mlData ? (
-            <>
-              {/* Pass the actual data into the components! */}
+      <div className="w-full space-y-8">
+        <div className="w-full space-y-6">
+          {mlData && !isProcessing && (
+            <div className="space-y-6">
               <ModelResponse data={mlData} />
               <LlmResponse data={llmData} />
-            </>
-          ) : (
-            <div className="flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 text-zinc-400 dark:border-zinc-800">
-              <p className="text-sm">Submit the form to generate insights</p>
             </div>
           )}
         </div>
