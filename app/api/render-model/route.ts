@@ -1,48 +1,44 @@
-import { NextResponse } from "next/server";
-import { HeartAnalysisRequest, ModelPredictionResponse } from "@/types/model";
+import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    // 1. Receive the request body from ModelContainer
-    const body: HeartAnalysisRequest = await req.json();
+    // 1. Grab the patient data from the frontend request
+    const body = await req.json();
 
-    // TEMPLATE: Replace this with your actual API endpoint
-    const EXTERNAL_API_URL = "https://jsonplaceholder.typicode.com/posts";
-
-    // 2. Make the external API call using the received body
-    const response = await fetch(EXTERNAL_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": "Bearer YOUR_API_KEY", // Add headers as needed
-      },
-      body: JSON.stringify({
-        ...body, // Spreading all our form data into the external request
-        source: "HeartSwarmIntelligence",
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`External API responded with status: ${response.status}`);
+    // 2. Validate that your environment variable is set
+    const apiKey = process.env.OUR_MODEL_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Server Configuration Error: Model API Key is missing." },
+        { status: 500 }
+      );
     }
 
-    const dataFromExternalApi = await response.json();
+    // 3. Forward the request to your live Render server
+    const renderApiUrl = "https://heart-disease-mlops-tmzf.onrender.com/predict";
+    const response = await fetch(renderApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey, // Securely injected on the server side!
+      },
+      body: JSON.stringify(body),
+    });
 
-    // 3. Return a response that matches our ModelPredictionResponse interface
-    const result: ModelPredictionResponse = {
-      risk_score: 0.85, // Mock result
-      prediction: "High Risk",
-      confidence: 0.92,
-      // @ts-ignore - for debugging purposes so your friend can see the API output
-      _external_debug: dataFromExternalApi,
-    };
+    // 4. Handle Render server errors (e.g., if the container crashed)
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Render API responded with status: ${response.status} - ${errorData}`);
+    }
 
-    return NextResponse.json(result);
+    // 5. Send the successful JSON back to the Next.js frontend
+    const data = await response.json();
+    return NextResponse.json(data);
 
   } catch (error: any) {
-    console.error("API Route Error:", error);
+    console.error("Error in render-model API route:", error);
     return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
+      { error: error.message || "Failed to communicate with the ML model." },
       { status: 500 }
     );
   }
