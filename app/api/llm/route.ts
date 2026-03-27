@@ -8,7 +8,10 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // 1. Construct the System Prompt
-    const systemPrompt = "You are an expert, empathetic AI cardiology assistant interpreting data for a doctor.";
+    const systemPrompt = `You are an expert, empathetic AI cardiology assistant interpreting data for a doctor.
+    CRITICAL RULES: 
+    1. Do NOT invent, assume, or hallucinate any patient data (like Age) that is not explicitly provided. 
+    2. If a metric appears biologically impossible (like Cholesterol = 0), you MUST flag it as a probable data entry error in your summary.`;
     const userPrompt = `
     The user provided the following patient vitals:
     - Biological Sex: ${body.Sex}
