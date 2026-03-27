@@ -10,20 +10,22 @@ export default function Tooltip({ content }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div 
-      className="relative inline-block ml-1 align-middle"
+    <div
+      className="relative flex items-center ml-2"
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
+      // Added touch events so it works on mobile phones when tapped!
+      onTouchStart={() => setIsVisible(!isVisible)}
     >
-      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 text-xs font-bold transition-colors hover:bg-zinc-300 dark:hover:bg-zinc-600">
+      <div className="flex items-center justify-center w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400 text-[10px] font-bold cursor-help transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800">
         i
       </div>
-      
+
       {isVisible && (
-        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-56 p-3 bg-zinc-900 text-zinc-50 text-sm rounded-lg shadow-xl z-50 border border-zinc-800">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-900 text-zinc-50 text-xs leading-relaxed rounded-xl shadow-xl z-50 border border-zinc-800 animate-in fade-in zoom-in-95 duration-200 pointer-events-none">
           {content}
-          {/* Arrow */}
-          <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-zinc-900" />
+          {/* Downward pointing triangle arrow */}
+          <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-zinc-900" />
         </div>
       )}
     </div>
