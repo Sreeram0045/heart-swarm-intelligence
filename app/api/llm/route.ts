@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         // Using the latest flash model
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
         const result = await model.generateContent(`${systemPrompt}\n\n${userPrompt}`);
         const text = result.response.text();
